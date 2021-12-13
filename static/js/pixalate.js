@@ -36,6 +36,9 @@ class PixalAte{
         $("#bookmark-button").click(function(){
             this.bookmark()
         }.bind(this))
+        $(".small-multiple").click(function(){
+            this.bookmark()
+        }.bind(this))
     }
 
     update_score_plot(predicate_mask){
@@ -82,7 +85,7 @@ class PixalAte{
     }
 
     control_change(){
-        if (!this.control.from_plot){
+        if (!this.specified_plot.control.from_plot){
             this.specified_plot.control_change()
             var is_bookmarked = this.bookmarked_plots.is_bookmarked(this.specified_plot.plot)
             this.specified_plot.is_bookmarked = is_bookmarked

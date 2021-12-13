@@ -21,18 +21,24 @@ class BookmarkedPlots{
         this.num_plots++
     }
 
-    remove_bookmark(plot){
-        console.log('remove_bookmark')
+    get_plot_index(plot){
+        var index = -1
         for (var i=0; i<this.plots.length; i++){
             if (this.plots[i].equals(plot)){
                 var index = i
             }
         }
+        return index
+    }
+
+    remove_bookmark(plot){
+        var index = this.get_plot_index(plot)
         var container_id = this.container_ids[index]
         $("#" + container_id).remove()
     }
 
     is_bookmarked(plot){
-        return this.bookmarked_plots.plots.includes(plot)
+        var index = this.get_plot_index(plot)
+        return index > -1
     }
 }
