@@ -1,0 +1,86 @@
+.header {
+    font-weight: bold;
+    margin-left: 10px;
+    margin-top: 5px;
+}
+
+.shelf-label {
+    font-weight: bold;
+    border: 1px solid #000000 !important;
+    background-color: #c0c0c0;
+    margin-left: 10px !important;
+    border-top-left-radius: 5px;
+    border-bottom-left-radius: 5px;
+    flex: 0 0 65%;
+}
+
+.shelf {
+    border: 1px solid #000000 !important;
+    background-color: #e9e9e9;
+    margin-right: 10px !important;
+    border-top-right-radius: 5px;
+    border-bottom-right-radius: 5px;
+    flex: 1;
+}
+
+.shelf-container {
+    display: flex;
+    margin-top: 5x;
+    margin-bottom: 5px;
+    margin-left: 0px !important;
+    width: 100%
+  }
+
+  .filter-container {
+      display: flex;
+      margin-left: 10px;
+      margin-right: 10px;
+  }
+
+  .filter-label {
+    flex: 0 0 65%;
+  }
+
+  .filter-value {
+    flex: 1;
+  }
+
+  .specified-container {
+    /* border: 1px solid #000000 !important; */
+    /* margin-top: 15px;
+    margin-bottom: 15px; */
+    margin: 15px;
+    /* border-radius: 5px; */
+    background-color: white;
+}
+
+#recomendations {
+    overflow-y: scroll;
+}
+
+.recomendation-plot-container {
+    /* margin: 15px; */
+}
+
+.recomendation-text {
+    margin-top: 20px;
+    display: flex;
+    justify-content: center;
+    /* align-items: center; */
+}
+
+.x-text {
+    color: orange
+}
+
+.y-text {
+    color: red
+}
+
+.filter-text {
+    color: green
+}
+
+.filter-values-dropdown{
+    margin-left: 20px;
+}

@@ -1,0 +1,162 @@
+:root {
+    --margin: 10px;
+    --selected_color: #1f77b4;
+    --hovered_color: #b41fa8;
+}
+
+.header {
+    font-weight: bold;
+    margin-left: 10px;
+    margin-right: 10px;
+    margin-top: 5px;
+}
+
+.container-0 {
+    height: calc(100vh - 116px)
+}
+
+.container-1 {
+    height: 100%;
+    background-color: #dfdede;
+    padding: 0px;
+}
+
+.container-2 {
+    border: 1px solid #000000 !important;
+    margin-top: var(--margin);
+    margin-left: var(--margin);
+    border-radius: 5px;
+    height: calc(50% - (1.5 * var(--margin)));
+    background-color: white;
+}
+
+.container-3 {
+    border: 1px solid #000000 !important;
+    border-radius: 5px;
+}
+
+.container-bottom {
+    margin-bottom: var(--margin);
+    /* overflow-y: scroll; */
+}
+
+.container-right {
+    margin-right: var(--margin);
+}
+
+#control-container {
+    margin-top: var(--margin);
+    margin-bottom: var(--margin);
+    margin-left: var(--margin);
+    height: calc(100% - (2 * var(--margin)));
+    width: calc(20% - (1.5 * var(--margin)));
+}
+
+#specified-plot-outer {
+    margin: var(--margin);
+    height: calc(100% - (2 * var(--margin)));
+    width: calc(80% - (1.5 * var(--margin)));
+}
+
+#predicates-text-container {
+    overflow-y: scroll;
+}
+
+#features-dropdown{
+    margin:15px;
+}
+
+#feature-plot-container {
+    overflow-y: scroll;
+}
+
+#score-plot-container{
+    /* margin: var(--margin); */
+    height: calc(100% - (2 * var(--margin)) - 15px);
+    width: 100%;
+    /* width: calc(80% - (1.5 * var(--margin))); */
+}
+
+.feature-plot-container {
+    border: 1px solid #000000 !important;
+    /* margin-top: 15px;
+    margin-bottom: 15px; */
+    margin: 15px;
+    border-radius: 5px;
+    background-color: white;
+    height: 180px
+}
+
+/* .recommendation-container{
+    width: 100%;
+    height: 100%;
+    overflow-y: scroll;
+} */
+
+#recommended-plots-buttons{
+    margin-left: 7px;
+}
+
+.recommendation-button{
+    margin-left: 3px;
+}
+
+#recommended-plots-container{
+    margin-left: 10px;
+    margin-right: 10px;
+    height: 100%;
+    overflow-y: scroll;
+}
+
+#bookmarked-plots-container{
+    margin-left: 10px;
+    margin-right: 10px;
+    height: 100%;
+    overflow-y: scroll;
+}
+
+.recommended-tab-content{
+    height: calc(100% - 70px);
+}
+
+.recommended-tab-panel{
+    height: 100%;
+}
+
+.tab-pane{
+    height: 100%;
+}
+
+#recommended-plots-container{
+    height: 100%;
+}
+
+.small-multiple-text{
+    margin-left: 15px;
+    width: calc(30% - 15px);
+    height: 240px;
+}
+
+.small-multiple-plot{
+    width: calc(70% - 15px);
+    height: 240px;
+    padding-bottom: 20px;
+}
+
+.filter-container{
+    display: inline-block !important;
+    width: 100%;
+}
+
+.filter-values-dropdown{
+    width: 80%
+}
+
+.filter-values-slider{
+    width: 80%
+}
+
+.remove-filter-button{
+    width: 20%;
+    padding: 0px;
+}

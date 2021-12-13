@@ -1,0 +1,9 @@
+.selected-predicate-node {
+    stroke: var(--selected_color);
+    stroke-width: 5;
+}
+
+.hovered-predicate-node {
+    stroke: var(--hovered_color);
+    stroke-width: 5;
+}

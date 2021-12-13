@@ -1,0 +1,24 @@
+.predicate-text {
+    border: 1px solid;
+    margin: 10px;
+    border-radius: 5px;
+    background-color: #dfdfdf;
+    /* min-height: 50px; */
+    display: block;
+    align-items: center; /* align vertical */
+    padding: 5px;
+}
+
+.selected-predicate-text {
+    border-color: var(--selected_color) !important;
+    border-width: 3px !important;
+}
+
+.predicate-feature {
+    border: 1px solid #000000 !important;
+    margin: 5px;
+    padding: 5px;
+    border-radius: 7px;
+    background-color: #adadad;
+    display: inline-block
+}

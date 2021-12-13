@@ -1,0 +1,19 @@
+.feature-plot-header {
+    height: 20%;
+    width: 100%
+}
+
+.feature-plot {
+    height: 80%;
+    width: 100%;
+}
+
+.feature-text {
+    margin-left: 5px;
+}
+
+.pivot-button {
+    float: right;
+    margin-right: 5px;
+    margin-top: 5px;
+}
