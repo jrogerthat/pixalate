@@ -36,9 +36,6 @@ class PixalAte{
         $("#bookmark-button").click(function(){
             this.bookmark()
         }.bind(this))
-        $(".small-multiple").click(function(){
-            this.bookmark()
-        }.bind(this))
     }
 
     update_score_plot(predicate_mask){
@@ -74,14 +71,20 @@ class PixalAte{
         }.bind(this))
     }
 
+    get_recommendations(plot, predicate_id, predicate, feature, agg){
+        this.recommended_plots.get_recommendations(predicate_id, predicate, feature, agg).then(function(resp){
+            this.recommended_plots.plot_recommendations(plot, resp['recommendations'])
+            $(".small-multiple").click(function(elem){
+                this.select_small_multiple(elem, true)
+            }.bind(this))
+        }.bind(this))
+    }
+
     select_feature(feature){
         var plot = this.feature_plots.plots[feature]
         this.specified_plot.plot_copy(plot)
         var predicate = this.predicates[this.selected_predicate_id]
-        this.recommended_plots.get_plots(plot, this.selected_predicate_id, predicate, feature, "mean")
-        if (this.is_recommended){
-            this.recommended_plots.plot()
-        }
+        this.get_recommendations(plot, this.selected_predicate_id, predicate, feature, "mean")
     }
 
     control_change(){
@@ -135,7 +138,6 @@ class PixalAte{
     }
 
     bookmark(){
-        console.log('bookmark')
         var plot = this.specified_plot.plot
         if (plot != null){
             if (this.specified_plot.is_bookmarked){
@@ -148,25 +150,34 @@ class PixalAte{
                 this.specified_plot.is_bookmarked = true
             }
             this.toggle_bookmark()
+            $(".small-multiple").click(function(elem){
+                this.select_small_multiple(elem, false)
+            }.bind(this))
         }
     }
 
-    select_small_multiple(plot){
-        is_bookmarked = this.bookmarked_plots.is_bookmarked(plot)
+    get_plot_from_container_id(container_id){
+        if (container_id.split('-')[0] == 'boomarked'){
+            return this.bookmarked_plots.get_plot_from_container_id(container_id)
+        }
+    }
+
+    select_small_multiple(elem, is_recommended){
+        var content_id = elem.currentTarget.id
+        var content_id_array = content_id.split('-')
+        content_id_array.splice(content_id_array.length-1, 1)
+        var container_id = content_id_array.join('-')
+        if (is_recommended){
+            var plot = this.recommended_plots.get_plot_from_container_id(container_id)
+        } else {
+            var plot = this.bookmarked_plots.get_plot_from_container_id(container_id)
+        }
+
+        this.specified_plot.plot_copy(plot)
+        var is_bookmarked = this.bookmarked_plots.is_bookmarked(plot)
         this.specified_plot.is_bookmarked = is_bookmarked
         this.toggle_bookmark()
     }
-
-    // toggle_recommended(){
-    //     console.log('toggle_recommended')
-    //     if (this.recommended_plots.is_selected){
-    //         this.recommended_plots.is_selected = false
-    //     } else {
-    //         console.log('select')
-    //         this.recommended_plots.plot()
-    //         this.recommended_plots.is_selected = true
-    //     }
-    // }
 
     add_filter(feature, values){
         this.control.add_filter(feature, values)

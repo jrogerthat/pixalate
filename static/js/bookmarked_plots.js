@@ -41,4 +41,10 @@ class BookmarkedPlots{
         var index = this.get_plot_index(plot)
         return index > -1
     }
+
+    get_plot_from_container_id(container_id){
+        console.log(this.container_ids)
+        var index = this.container_ids.indexOf(container_id)
+        return this.plots[index]
+    }
 }

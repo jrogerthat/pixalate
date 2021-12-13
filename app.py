@@ -25,8 +25,6 @@ def index():
     with open(f'{path}/static/data/{name}_dtypes.json', 'r') as f:
         dtypes = json.load(f)
     predicate_masks = {k: [bool(val) for val in pd.DataFrame(v).all(axis=1)] for k,v in predicate_feature_masks.items()}
-
-    print(predicate_masks.keys())
     
     # with open(f'{path}/static/data/predicate_masks.json', 'r') as f:
     #     predicate_masks = json.load(f)
