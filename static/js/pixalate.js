@@ -26,6 +26,9 @@ class PixalAte{
         //     var predicate_id = elem.target.id.split('-')[2]
         //     this.select_predicate_id(predicate_id, true)
         // }.bind(this))
+        $(".dropdown").change(function(){
+            this.control_change()
+        }.bind(this))
         $("#recommended-tab-button, #bookmarked-tab-button").click(function(){
             // this.toggle_recommended()
             // this.toggle_bookmarked()
@@ -78,6 +81,15 @@ class PixalAte{
         }
     }
 
+    control_change(){
+        if (!this.control.from_plot){
+            this.specified_plot.control_change()
+            var is_bookmarked = this.bookmarked_plots.is_bookmarked(this.specified_plot.plot)
+            this.specified_plot.is_bookmarked = is_bookmarked
+            this.toggle_bookmark()
+        }
+    }
+
     get_direction(x, y, predicate_mask){
         var in_count = 0
         var out_count = 0
@@ -124,11 +136,9 @@ class PixalAte{
         var plot = this.specified_plot.plot
         if (plot != null){
             if (this.specified_plot.is_bookmarked){
-                console.log('remove_bookmark')
                 this.bookmarked_plots.remove_bookmark(plot)
                 this.specified_plot.is_bookmarked = false
             } else {
-                console.log('add_bookmark')
                 var predicate_mask = this.predicate_masks[this.selected_predicate_id]
                 var direction = this.get_direction(plot.x, plot.y, predicate_mask)
                 this.bookmarked_plots.add_bookmark(plot, direction)

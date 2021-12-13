@@ -4,12 +4,6 @@ class SpecifiedPlot{
         this.control = control
         this.plot = null
         this.is_bookmarked = false
-        $(".dropdown").change(function(){
-            if (!this.control.from_plot){
-                console.log('change dropdown')
-                this.control_change()
-            }
-        }.bind(this))
     }
 
     plot_copy(plot){
