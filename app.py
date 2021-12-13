@@ -3,8 +3,6 @@ import os
 import json
 import pandas as pd
 from pandas.core.dtypes import dtypes
-from sklearn.linear_model import LinearRegression, LogisticRegression
-from sklearn.metrics import r2_score
 import numpy as np
 
 app = Flask(__name__)
