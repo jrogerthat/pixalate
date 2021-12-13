@@ -3,6 +3,7 @@ class SpecifiedPlot{
         this.container_id = container_id
         this.control = control
         this.plot = null
+        this.is_bookmarked = false
         $(".dropdown").change(function(){
             if (!this.control.from_plot){
                 console.log('change dropdown')

@@ -109,18 +109,39 @@ class PixalAte{
         }
     }
 
+    toggle_bookmark(){
+        if (this.specified_plot.is_bookmarked){
+            $("#bookmark-button").removeClass("btn-outline-secondary")
+            $("#bookmark-button").addClass("btn-primary")
+        } else {
+            $("#bookmark-button").addClass("btn-outline-secondary")
+            $("#bookmark-button").removeClass("btn-primary")
+        }
+    }
+
     bookmark(){
         console.log('bookmark')
         var plot = this.specified_plot.plot
         if (plot != null){
-            var predicate_mask = this.predicate_masks[this.selected_predicate_id]
-            var direction = this.get_direction(plot.x, plot.y, predicate_mask)
-            this.bookmarked_plots.add_bookmark(plot, direction)
+            if (this.specified_plot.is_bookmarked){
+                console.log('remove_bookmark')
+                this.bookmarked_plots.remove_bookmark(plot)
+                this.specified_plot.is_bookmarked = false
+            } else {
+                console.log('add_bookmark')
+                var predicate_mask = this.predicate_masks[this.selected_predicate_id]
+                var direction = this.get_direction(plot.x, plot.y, predicate_mask)
+                this.bookmarked_plots.add_bookmark(plot, direction)
+                this.specified_plot.is_bookmarked = true
+            }
+            this.toggle_bookmark()
         }
     }
 
     select_small_multiple(plot){
-
+        is_bookmarked = this.bookmarked_plots.is_bookmarked(plot)
+        this.specified_plot.is_bookmarked = is_bookmarked
+        this.toggle_bookmark()
     }
 
     // toggle_recommended(){

@@ -82,7 +82,7 @@ def get_model_score(data, encoded_data, dtypes, x_feature, y_feature):
     score = r2_score(y, predy)
     return score
 
-def get_recommendations(data, encoded_data, dtypes, predicate, x_feature, agg):
+def get_recommendations():#data, encoded_data, dtypes, predicate, x_feature, agg):
     # res = []
     # mask = predicate[[col for col in predicate.columns if col != x_feature]].all(axis=1)
     # for y_feature in data.columns:
@@ -108,23 +108,23 @@ def get_recommendations(data, encoded_data, dtypes, predicate, x_feature, agg):
 
 @app.route("/get_recommendations", methods=['POST'])
 def app_get_recommendations():
-    data = pd.read_csv(f'{path}/static/data/superstore_data_43214123.csv')
-    encoded_data = pd.read_csv(f'{path}/static/data/superstore_encoded_data_43214123.csv')
-    with open(f'{path}/static/data/dtypes.json', 'r') as f:
-        dtypes = json.load(f)
-    with open(f'{path}/static/data/predicate_masks.json', 'r') as f:
-        predicate_masks = json.load(f)
+    # data = pd.read_csv(f'{path}/static/data/superstore_data_43214123.csv')
+    # encoded_data = pd.read_csv(f'{path}/static/data/superstore_encoded_data_43214123.csv')
+    # with open(f'{path}/static/data/dtypes.json', 'r') as f:
+    #     dtypes = json.load(f)
+    # with open(f'{path}/static/data/predicate_masks.json', 'r') as f:
+    #     predicate_masks = json.load(f)
 
-    request_data = request.get_json(force=True)
-    predicate_id = request_data['predicate_id']
-    predicate_mask = pd.DataFrame(predicate_masks[predicate_id])
-    print(predicate_mask.all(axis=1).mean())
-    print(encoded_data.shape)
-    print(data.shape)
-    feature = request_data['feature']
-    agg = request_data['agg']
+    # request_data = request.get_json(force=True)
+    # predicate_id = request_data['predicate_id']
+    # predicate_mask = pd.DataFrame(predicate_masks[predicate_id])
+    # print(predicate_mask.all(axis=1).mean())
+    # print(encoded_data.shape)
+    # print(data.shape)
+    # feature = request_data['feature']
+    # agg = request_data['agg']
 
-    res = get_recommendations(data, encoded_data, dtypes, predicate_mask, feature, agg)
+    res = get_recommendations()#data, encoded_data, dtypes, predicate_mask, feature, agg)
     print(res)
     res = res[res.score > .01]
     return json.dumps({"recommendations": res.to_dict("records")})

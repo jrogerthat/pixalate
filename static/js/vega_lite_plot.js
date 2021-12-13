@@ -190,6 +190,24 @@ class Plot extends VegaLitePlot {
     }
 
     equals(plot){
-        return (this.x == plot.x) && (this.x_values = plot.x_values) && (this.y = plot.y) && (this.agg == plot.agg) && (this.color == plot.color) && (this.filter == plot.filter) && (this.mark == plot.mark)
+        console.log('equals')
+        console.log(Object.keys(plot.filter))
+        console.log(Object.keys(this.filter))
+        if (Object.keys(plot.filter) != Object.keys(this.filter)){
+            var filter_is_equal = false
+            console.log('keys not equal')
+        } else {
+            var filter_is_equal = true
+            for (var feature in this.filter){
+                if (plot.filter[feature] != this.filter[feature]){
+                    filter_is_equal = false
+                    console.log('values not equal')
+                }
+            }
+        }
+        var is_equal = (this.x == plot.x) && (this.x_values = plot.x_values) && (this.y = plot.y) && (this.agg == plot.agg) && (this.color == plot.color) && (this.mark == plot.mark)
+        console.log(is_equal)
+        console.log(filter_is_equal)
+        return filter_is_equal && is_equal
     }
 }

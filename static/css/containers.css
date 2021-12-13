@@ -133,12 +133,12 @@
 
 .small-multiple-text{
     margin-left: 15px;
-    width: calc(30% - 15px);
+    width: calc(40% - 15px);
     height: 240px;
 }
 
 .small-multiple-plot{
-    width: calc(70% - 15px);
+    width: calc(60% - 15px);
     height: 240px;
     padding-bottom: 20px;
 }
