@@ -1,7 +1,8 @@
 class SmallMultiplePlots{
-    constructor(container_id, original_plot){
+    constructor(container_id, original_plot, feature_values){
         this.container_id = container_id
         this.original_plot = original_plot
+        this.feature_values = feature_values
         this.plot = null
     }
 
@@ -22,18 +23,27 @@ class SmallMultiplePlots{
         return container
     }
 
-    get_feature_value_text(feature, values, dtype){
+    get_feature_value_text(feature, values, dtype, val_only){
         if (dtype == "nominal"){
-            var a = " is " + values.join(" or ")
+            var a = " is "
+            var b = values.join(", ")
+            b = b.replace(/,([^,]*)$/, " or" + '$1')
         } else if (dtype == 'binary'){
-            var a = " is " + values[0]
+            var a = " is "
+            var b = values[0]
         } else if (dtype == 'numeric') {
-            var a = " between " + values[0].toFixed(2) + " and " + values[1].toFixed(2)
+            var a = " is between "
+            var b = values[0].toFixed(2) + " and " + values[1].toFixed(2)
         } else {
-            var a = " between " + values[0] + " and " + values[1]
+            var a = " is between " 
+            var b = values[0] + " and " + values[1]
         }
-        var text = feature + a
-        return text
+
+        if (val_only){
+            return b
+        } else {
+            return feature + a + b
+        }
     }
 
     get_filter_text(filters){
@@ -43,7 +53,7 @@ class SmallMultiplePlots{
             filters_text_list.push(t)
         }
         if (filters_text_list.length > 0){
-            var text = " if " + (filters_text_list.join(" and "))
+            var text = " when " + (filters_text_list.join(" and "))
         } else {
             var text = ""
         }
@@ -51,31 +61,70 @@ class SmallMultiplePlots{
     }
 
     get_x_filter_text(filters, x, x_values, dtypes){
-        var x_text = document.createElement("span")
-        x_text.className = "x-text"
-        var t = this.get_feature_value_text(x, x_values, dtypes[x])
-        x_text.innerHTML = " when " + t
+        var in_text = document.createElement("span")
+        in_text.className = "in-text"
+        var in_t = this.get_feature_value_text(x, x_values, dtypes[x])
+        in_text.innerHTML = " when " + in_t
+
+        var out_text = document.createElement("span")
+        out_text.className = "out-text"
+
+        if (['date', 'numeric'].includes(dtypes[x])){
+            var left_t = this.get_feature_value_text(x, [this.feature_values[x][0], x_values[0]], dtypes[x], false)
+            var right_t = this.get_feature_value_text(x, [x_values[1], this.feature_values[x][1]], dtypes[x], true)
+            var out_t = left_t + " or " + right_t
+        } else if (dtypes[x] == "nominal"){
+            var out_values = []
+            for (var i=0; i<this.feature_values[x].length; i++){
+                if (!x_values.includes(this.feature_values[x][i])){
+                    out_values.push(this.feature_values[x][i])
+                }
+            }
+            var out_t = this.get_feature_value_text(x, out_values, dtypes[x])
+        } else if (dtypes[x] == 'binary'){
+            var out_t = this.get_feature_value_text(x, x_values, dtypes[x])
+        }
+        out_text.innerHTML = " when " + out_t
 
         var filters_text = document.createElement("span")
         filters_text.id = this.container_id + "-filters-text"
         filters_text.className = "filters-text"
         filters_text.innerHTML = this.get_filter_text(filters)
-        return {'x': x_text, 'filters': filters_text}
+        return {'in_text': in_text, 'out_text': out_text, 'filters': filters_text}
     }
 
     get_plot_text(direction){
+        var in_mean = direction['in_mean']
+        var out_mean = direction['out_mean']
+        var d = direction['direction']
         var text_container = document.createElement("div")
+
         var y_text = document.createElement("span")
         var agg_to_text = {"mean": "Average", "sum": "total"}
         var agg_text = agg_to_text[this.original_plot.agg]
-        y_text.innerHTML = agg_text + " " + this.original_plot.y + " is " + direction
+
+        y_text.innerHTML = agg_text + " " + this.original_plot.y + " is " + d
         y_text.id = this.container_id + "-y-text"
         y_text.className = "y-text"
         text_container.appendChild(y_text)
 
         var x_filter_text = this.get_x_filter_text(this.original_plot.filter, this.original_plot.x, this.original_plot.x_values, this.original_plot.dtypes)
+        text_container.appendChild(x_filter_text['in_text'])
+        var y_in_mean_text = document.createElement("span")
+        y_in_mean_text.innerHTML = " (" + in_mean.toFixed(2) + ") "
+        y_in_mean_text.className = "in-mean-text"
+        text_container.appendChild(y_in_mean_text)
 
-        text_container.appendChild(x_filter_text['x'])
+        var compared_to_text = document.createElement("span")
+        compared_to_text.innerHTML = " compared to"
+        text_container.appendChild(compared_to_text)
+
+        text_container.appendChild(x_filter_text['out_text'])
+        var y_out_mean_text = document.createElement("span")
+        y_out_mean_text.innerHTML = " (" + out_mean.toFixed(2) + ") "
+        y_out_mean_text.className = "out-mean-text"
+        text_container.appendChild(y_out_mean_text)
+
         text_container.appendChild(x_filter_text['filters'])
         return text_container
     }
@@ -111,7 +160,8 @@ class SmallMultiplePlots{
     }
 
     change_plot_y(y){
-        this.plot.update_plot(null, y, null, null, null, null)
+        this.plot = this.plot.update_plot(null, y, null, null, null, null)
+        this.plot.plot("container", "container")
     }
 
     change_text_y(y, direction){

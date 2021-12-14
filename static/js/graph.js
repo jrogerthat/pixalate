@@ -78,7 +78,7 @@ class Graph{
             .force("link", d3.forceLink()
                     .id(function(d) { return d.id; })
                     .links(graph_data.links)
-                    .distance(function(d) { return max_distance / (Math.exp(d.similarity)) })
+                    .distance(function(d) { return max_distance / (Math.exp(d.similarity)*1.55) })
 
             )
             .force("charge", d3.forceManyBody().strength(-200))

@@ -44,6 +44,7 @@ class FeaturePlots extends VegaLitePlot{
                 filter[f] = this.predicate[f]
             }
         }
+
         var plot = new Plot(feature, this.predicate[feature], this.score_col, "mean", feature + "_values", filter, 'bar', this.data, this.dtypes, plot_container_id)
         plot.plot(width, height)
         return plot

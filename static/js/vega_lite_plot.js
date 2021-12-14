@@ -11,7 +11,7 @@ class VegaLitePlot {
         } else if (['nominal', 'ordinal', 'binary'].includes(x_dtype)){
             var encode_x = {'field': x, type: 'nominal'}
         } else if (x_dtype == 'date') {
-            var encode_x = {"field": x,  "timeUnit": {"unit": "yeardate", "step": 7}, 'type': 'temporal'}
+            var encode_x = {"field": x,  "timeUnit": {"unit": "yearmonthdate", "step": 7}, 'type': 'temporal'}
             // var encode_x = {"field": x, "timeUnit": {"unit": "day", "step": 1}, 'type': 'temporal'}
         }
 
@@ -47,6 +47,14 @@ class VegaLitePlot {
                     transform.push({'filter': {'field': feature, 'oneOf': filter[feature]}})
                 } else if (this.dtypes[feature] == 'binary'){
                     transform.push({'filter': {'field': feature, 'equal': filter[feature][0]}})
+                } else if (this.dtypes[feature] == 'date'){
+                    transform.push({'filter': {'timeUnit': 'yearmonthdate', 'field': feature, 'range': filter[feature], type: 'temporal'}})
+                    // transform.push({'filter': {'field': feature, 'range': [this.parse_time(filter[feature][0]), this.parse_time(filter[feature][1])]}})
+                    // var date_array_left = filter[feature][0].split('-')
+                    // var date_array_right = filter[feature][1].split('-')
+                    // var range = [{'year': parseInt(date_array_left[0]), 'month': parseInt(date_array_left[1]), 'day': parseInt(date_array_left[2])}, 
+                    //              {'year': parseInt(date_array_right[0]), 'month': parseInt(date_array_right[1]), 'day': parseInt(date_array_right[2])}]
+                    // transform.push({'filter': {"timeUnit": "year", 'field': feature, 'range': range}})
                 }
             }
         }
@@ -96,6 +104,24 @@ class VegaLitePlot {
         } else {
             formatted_spec['height'] = height
         }
+
+        // if (dtypes != null){
+        //     var formatted_data = []
+        //     for (var i=0; i<data.length; i++){
+        //         var row = {}
+        //         for (var col in data[i]){
+        //             if (dtypes[col] == 'date'){
+        //                 row[col] = this.parse_time(data[i][col])
+        //             } else {
+        //                 row[col] = data[i][col]
+        //             }
+        //         }
+        //         formatted_data.push(row)
+        //     }
+        //     formatted_spec['data'] = {'values': formatted_data}
+        // } else {
+        //     formatted_spec['data'] = {'values': data}
+        // }
         formatted_spec['data'] = {'values': data}
         for (var k in spec){
             if (!Object.keys(formatted_spec).includes(k)){
@@ -135,41 +161,42 @@ class Plot extends VegaLitePlot {
     }
 
     update_plot(x, y, agg, color, filter, mark){
+        var plot = this.copy(this.plot_container_id)
         if (x != null){
-            this.x = x
+            plot.x = x
         }
         if (y != null){
-            this.y = y
+            plot.y = y
         }
         if (agg != null){
-            this.agg = agg
+            plot.agg = agg
         }
         if (color != null){
-            this.color = color
+            plot.color = color
         }
         if (filter != null){
-            this.filter = filter
+            plot.filter = filter
         }
         if (mark != null){
-            this.mark = mark
+            plot.mark = mark
         }
-        // this.plot(this.width, this.height)
-    }
-
-    add_filter(feature, value){
-        this.filter[feature] = [value]
-        this.plot(this.width, this.height)
+        return plot
     }
 
     remove_filter(feature){
-        console.log("remove_filter")
+        var plot = this.copy(this.plot_container_id)
         var filter = {}
         for (var f in this.filter){
             if (f != feature){
                 filter[f] = this.filter[f]
             }
         }
-        this.filter = filter
+        plot.filter = filter
+        return plot
+    }
+
+    add_filter(feature, value){
+        this.filter[feature] = [value]
         this.plot(this.width, this.height)
     }
 
@@ -186,7 +213,7 @@ class Plot extends VegaLitePlot {
                 x_values.push(this.x_values[i])
             }
         }
-        return new Plot(this.x, x_values, this.y, this.agg, this.color, filter, this.mark, this.data, this.dtypes, plot_container_id)
+        return new Plot(this.x, x_values, this.y, this.agg, this.color, filter, this.mark, this.data, this.dtypes, plot_container_id, this)
     }
 
     equals(plot){

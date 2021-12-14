@@ -160,3 +160,7 @@
     width: 20%;
     padding: 0px;
 }
+
+#control-container{
+    overflow-y: scroll;
+}

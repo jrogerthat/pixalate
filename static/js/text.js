@@ -73,4 +73,10 @@ class Text {
             $("#predicate-text-" + predicate_id).addClass("selected-predicate-text")
         }
     }
+
+    scroll_to(predicate_id){
+        $("#" + this.container_id).animate({
+            scrollTop: $("#predicate-text-" + predicate_id).offset().top
+        }, 2000)
+    }
 }

@@ -1,13 +1,18 @@
 class RecommendedPlots{
-    constructor(container_id){
+    constructor(container_id, feature_values){
         this.container_id = container_id
+        this.feature_values = feature_values
         this.plots = []
         this.container_ids = []
         this.is_selected = true
     }
 
-    plot_recommendations(plot, recommendations){
+    clear_recommendations(){
+        this.plots = []
         $("#" + this.container_id).empty()
+    }
+
+    plot_recommendations(plot, recommendations){
         this.recommendations = recommendations
         for (var i=0; i<recommendations.length; i++){
             var direction = recommendations[i]['direction']
@@ -20,10 +25,10 @@ class RecommendedPlots{
             this.container_ids.push(container_id)
             $("#" + this.container_id).append(container)
 
-            var rec_plot = new SmallMultiplePlots(container_id, plot)
+            var rec_plot = new SmallMultiplePlots(container_id, plot, this.feature_values)
             rec_plot.create_plot_and_text(direction)
             rec_plot.change_plot_y(feature)
-            rec_plot.change_text_y(feature, direction)
+            rec_plot.change_text_y(feature, direction['direction'])
             rec_plot.plot.plot("container", "container")
             this.plots.push(rec_plot.plot)
         }
@@ -44,7 +49,6 @@ class RecommendedPlots{
     }
 
     get_plot_from_container_id(container_id){
-        console.log(this.container_ids)
         var index = this.container_ids.indexOf(container_id)
         return this.plots[index]
     }

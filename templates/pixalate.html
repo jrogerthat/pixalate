@@ -16,6 +16,7 @@
         <link href="../static/css/text_.css" rel="stylesheet">
         <link href="../static/css/feature_plots_.css" rel="stylesheet">
         <link href="../static/css/control_.css" rel="stylesheet">
+        <link href="../static/css/small_multiples.css" rel="stylesheet">
 
         <!-- <link href="../static/css/specified_control.css" rel="stylesheet">
         <link href="../static/css/predicate.css" rel="stylesheet">
@@ -77,8 +78,16 @@
                     <div id="control-container" class="container-3"></div>
                     <div id="specified-plot-outer" class="container-3">
                         <div id="specified-plot-header" style="width: 100%; display: flex">
+                            <span>
+                                <button id="back-button" type="button" class="btn btn-outline-secondary" disabled style="margin-top: 5px; margin-left: 5px">
+                                    <i class="fas fa-undo"></i>
+                                </button>
+                                <button id="next-button" type="button" class="btn btn-outline-secondary" disabled style="margin-top: 5px; margin-left: 5px">
+                                    <i class="fas fa-redo"></i>
+                                </button>
+                            </span>
                             <span style="margin-left: auto;">
-                                <button id="bookmark-button" type="button" class="btn btn-outline-secondary" style="margin-top: 5px; margin-right: 5px">
+                                <button id="bookmark-button" type="button" class="btn btn-outline-secondary" disabled style="margin-top: 5px; margin-right: 5px">
                                     <i class="fas fa-bookmark"></i>
                                 </button>
                             </span>
@@ -87,16 +96,20 @@
                     </div>
                 </div>
                 <div id="recommended-plots-outer" class="container-2 container-right">
-                    <ul class="nav nav-tabs">
+                    <ul id="tabs" class="nav nav-tabs">
                         <li class="nav-item">
-                          <a id="recommended-tab-button" class="nav-link active" data-toggle="tab" href="#recommended-tab">Recommended</a>
+                            <a id="null-tab-button" class="nav-link active" data-toggle="tab" href="#null-tab"></a>
+                          </li>
+                        <li class="nav-item">
+                          <a id="recommended-tab-button" class="nav-link" data-toggle="tab" href="#recommended-tab">Why?</a>
                         </li>
                         <li class="nav-item">
                           <a id="bookmarked-tab-button" class="nav-link" data-toggle="tab" href="#bookmarked-tab">Bookmarked</a>
                         </li>
                       </ul>
                     <div class="tab-content recommended-tab-content">
-                        <div role="tabpanel" class="tab-pane active recommended-tab-panel" id="recommended-tab">
+                        <div role="tabpanel" class="tab-pane active" id="null-tab"></div>
+                        <div role="tabpanel" class="tab-pane recommended-tab-panel" id="recommended-tab">
                             <div id="recommended-plots-buttons"></div>
                             <div id="recommended-plots-container"></div>
                         </div>
@@ -147,6 +160,7 @@
         var bookmarked_plots_container_id = "bookmarked-plots-container"
 
         var predicate_masks = {{predicate_masks|safe}}
+        var predicate_feature_masks = {{predicate_feature_masks|safe}}
         var predicates = {{predicates|safe}}
         var graph_data = {{nodes_links|safe}}
 
@@ -159,12 +173,12 @@
         var graph = new Graph(graph_container_id, graph_data, score_col)
         var text = new Text(text_container_id, graph_data, predicates, dtypes)
         var control = new Control(control_container_id, features, dtypes, feature_values, score_col)
-        var specified_plot = new SpecifiedPlot(specified_plot_container_id, control)
-        var recommended_plots = new RecommendedPlots(recommended_plots_container_id)
-        var bookmarked_plots = new BookmarkedPlots(bookmarked_plots_container_id)
+        var specified_plot = new SpecifiedPlot(specified_plot_container_id, control, null, null)
+        var recommended_plots = new RecommendedPlots(recommended_plots_container_id, feature_values)
+        var bookmarked_plots = new BookmarkedPlots(bookmarked_plots_container_id, feature_values)
         var pixalate = new PixalAte(graph, text, specified_plot, recommended_plots, bookmarked_plots,
                                     score_plot_container_id, feature_plots_container_id,
-                                    data, dtypes, score_col, predicates, predicate_masks)
+                                    data, dtypes, score_col, predicates, predicate_masks, predicate_feature_masks)
         // var pixalate = new PixalAte(data, features, dtypes, feature_values, predicates, predicate_masks, nodes_links, score_col, predicate_nodes_container_id,
         //         predicates_text_container_id, score_plot_container_id, feature_plot_container_id, control_container_id, bookmarked_container_id, specified_plot_container_id,
         //         recommended_plots_container_id, recommended_plots_button_id)

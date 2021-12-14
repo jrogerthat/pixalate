@@ -1,10 +1,11 @@
 class BookmarkedPlots{
-    constructor(container_id){
+    constructor(container_id, feature_values){
         this.container_id = container_id
         this.plots = []
         this.container_ids = []
         this.num_plots = 0
         this.is_selected = true
+        this.feature_values = feature_values
     }
 
     add_bookmark(plot, direction){
@@ -13,7 +14,7 @@ class BookmarkedPlots{
         div.id = id
         $("#" + this.container_id).append(div)
         
-        var new_plot = new SmallMultiplePlots(id, plot)
+        var new_plot = new SmallMultiplePlots(id, plot, this.feature_values)
         new_plot.create_plot_and_text(direction)
         new_plot.plot.plot("container", "container")
         this.plots.push(new_plot.plot)

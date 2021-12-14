@@ -13,7 +13,7 @@ path = os.path.dirname(os.path.realpath(__file__))
 @app.route("/")
 def index():
     name = "sales"
-    score_col = "lof"
+    score_col = "anomaly_score"
     random_seed = 34231
 
     with open(f'{path}/static/data/{name}_predicate_masks.json', 'r') as f:
@@ -24,23 +24,9 @@ def index():
         nodes_links = json.load(f)
     with open(f'{path}/static/data/{name}_dtypes.json', 'r') as f:
         dtypes = json.load(f)
-    predicate_masks = {k: [bool(val) for val in pd.DataFrame(v).all(axis=1)] for k,v in predicate_feature_masks.items()}
-    
-    # with open(f'{path}/static/data/predicate_masks.json', 'r') as f:
-    #     predicate_masks = json.load(f)
-    # with open(f'{path}/static/data/predicates.json', 'r') as f:
-    #     predicates = json.load(f)
-    # with open(f'{path}/static/data/predicate_nodes.json', 'r') as f:
-    #     predicate_nodes = json.load(f)
-    # with open(f'{path}/static/data/grouped_predicate_nodes.json', 'r') as f:
-    #     grouped_predicate_nodes = json.load(f)
-    # with open(f'{path}/static/data/dtypes.json', 'r') as f:
-    #     dtypes = json.load(f)
-    # with open(f'{path}/static/data/feature_values.json', 'r') as f:
-    #     feature_values = json.load(f)
-    # with open(f'{path}/static/data/predicate_stats.json', 'r') as f:
-    #     predicate_stats = json.load(f)
 
+    predicate_masks = {k: list(pd.DataFrame({ki: list(vi.values()) for ki, vi in v.items()}).all(axis=1).values) for k,v in predicate_feature_masks.items()}
+    predicate_masks = {k: [bool(vi) for vi in v] for k, v in predicate_masks.items()}
     data = pd.read_csv(f'{path}/static/data/{name}_{random_seed}_data.csv')#.head(50)
     features = list(data.columns)
     feature_values = {}
@@ -53,7 +39,8 @@ def index():
             feature_values[feature] = list(sorted(data[feature].unique()))
     data_dict = data.to_dict('records')
 
-    return render_template("pixalate.html", predicate_masks=json.dumps(predicate_masks), predicates=predicates, nodes_links=nodes_links, data=json.dumps(data_dict),
+    return render_template("pixalate.html", predicate_masks=json.dumps(predicate_masks), predicate_feature_masks=json.dumps(predicate_feature_masks),  predicates=predicates,
+                            nodes_links=nodes_links, data=json.dumps(data_dict),
                             dtypes=dtypes, features=features, feature_values=feature_values, score_col=score_col)
 
     # return render_template("pixalate.html", predicate_masks=json.dumps(predicate_masks), predicates=predicates, predicate_nodes=predicate_nodes, grouped_predicate_nodes=grouped_predicate_nodes, data=json.dumps(data_dict),
@@ -78,28 +65,25 @@ def get_model_score(data, encoded_data, dtypes, x_feature, y_feature):
     score = r2_score(y, predy)
     return score
 
-def get_recommendations():#data, encoded_data, dtypes, predicate, x_feature, agg):
-    # res = []
-    # mask = predicate[[col for col in predicate.columns if col != x_feature]].all(axis=1)
-    # for y_feature in data.columns:
-    #     if y_feature in dtypes and dtypes[y_feature] == 'numeric':
-    #         print(y_feature)
-    #         score = get_model_score(data.loc[mask], encoded_data.loc[mask], dtypes, x_feature, y_feature)
-    #         direction = ['high', 'low'][
-    #             data.loc[mask].groupby(predicate.loc[mask].all(axis=1))[y_feature].agg(agg).idxmax()]
-    #         res.append({'feature': y_feature, 'score': score, 'direction': direction})
-    # res = pd.DataFrame(res)
-    # res = res.sort_values('score', ascending=False)
-
-    # res = pd.DataFrame([
-    #     {'feature': 'sales', 'direction': 'low', 'score': 1},
-    #     {'feature': 'profit', 'direction': 'low', 'score': 1}
-    # ])
-
+def get_recommendations(predicate_id, feature):
+    # all_res = {
+    #     ('0', 'product'): pd.DataFrame([
+    #         {'feature': 'profit', 'score': 1}
+    #     ]),
+    #     ('1', 'state'): pd.DataFrame([
+    #         {'feature': 'units', 'score': 1},
+    #          {'feature': 'sales', 'score': 1},
+    #           {'feature': 'profit', 'score': 1}
+    #     ])
+    # }
+    # res = all_res[(predicate_id, feature)]
     res = pd.DataFrame([
-        {'feature': 'sales', 'direction': 'low', 'score': 1},
-        {'feature': 'profit', 'direction': 'low', 'score': 1}
-    ])
+            {'feature': 'units', 'score': 1},
+            {'feature': 'unit_price', 'score': 1},
+            {'feature': 'unit_cost', 'score': 1},
+            {'feature': 'sales', 'score': 1},
+            {'feature': 'profit', 'score': 1}
+        ]) 
     return res
 
 @app.route("/get_recommendations", methods=['POST'])
@@ -111,16 +95,16 @@ def app_get_recommendations():
     # with open(f'{path}/static/data/predicate_masks.json', 'r') as f:
     #     predicate_masks = json.load(f)
 
-    # request_data = request.get_json(force=True)
-    # predicate_id = request_data['predicate_id']
+    request_data = request.get_json(force=True)
+    predicate_id = request_data['predicate_id']
     # predicate_mask = pd.DataFrame(predicate_masks[predicate_id])
     # print(predicate_mask.all(axis=1).mean())
     # print(encoded_data.shape)
     # print(data.shape)
-    # feature = request_data['feature']
+    feature = request_data['feature']
     # agg = request_data['agg']
 
-    res = get_recommendations()#data, encoded_data, dtypes, predicate_mask, feature, agg)
+    res = get_recommendations(predicate_id, feature)#data, encoded_data, dtypes, predicate_mask, feature, agg)
     print(res)
     res = res[res.score > .01]
     return json.dumps({"recommendations": res.to_dict("records")})

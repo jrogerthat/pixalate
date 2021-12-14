@@ -8,6 +8,7 @@ class Control {
 
         this.make_dropdowns()
         this.from_plot = false
+        this.filter = {}
     }
 
     get_dropdown(label, options){
@@ -15,6 +16,7 @@ class Control {
         container.className = "row dropdown-container"
 
         var dropdown_label = document.createElement("div")
+        dropdown_label.id = "dropdown-label-" + label
         dropdown_label.className = "col-5 dropdown-label"
         dropdown_label.innerHTML = label
         container.appendChild(dropdown_label)
@@ -22,7 +24,7 @@ class Control {
         var dropdown = document.createElement("select")
         dropdown.name = label
         dropdown.id = label
-        dropdown.className = "col-7 dropdown"
+        dropdown.className = "col-7 dropdown-value"
         container.appendChild(dropdown)
 
         var default_option = document.createElement("option")
@@ -47,6 +49,7 @@ class Control {
                 x_options.push(this.features[i])
             }
         }
+        this.num_x_options = x_options.length
         var x_dropdown = this.get_dropdown('x', x_options)
 
         var y_options = []
@@ -79,21 +82,154 @@ class Control {
         $("#" + this.container_id).append(filters_header)
     }
 
-    get_filter_container(feature){
-        var container = document.createElement("div")
-        container.className = "filter-container"
-        container.id = "filter-container-" + feature
-        return container
+    days_to_date(days, min_date){
+        var value = new Date(min_date)
+        value.setDate(value.getDate() + days)
+        var value = new Date(value).toISOString().split('T')[0]
+        return value
+    }
+
+    make_slider(container_id, feature, min, max, values, step, dtype, min_date){
+        var min_input = document.createElement("input")
+        min_input.type = "text"
+        min_input.className = feature + "-slider slider col-6"
+        min_input.setAttribute('data-index', 0);
+        if (dtype == 'date'){
+            min_input.value = this.days_to_date(values[0], min_date)
+        } else {
+            min_input.value = values[0]
+        }
+
+        var max_input = document.createElement("input")
+        max_input.type = "text"
+        max_input.className = feature + "-slider slider col-6"
+        max_input.setAttribute('data-index', 1);
+        if (dtype == 'date'){
+            max_input.value = this.days_to_date(values[1], min_date)
+        } else {
+            max_input.value = values[1]
+        }
+
+        var slider_container = document.createElement("div")
+        slider_container.id = container_id + "-slider"
+
+        var slider_container_bar = document.createElement("div")
+        var slider_container_bar_id = container_id + "-slider-bar"
+        slider_container_bar.id = slider_container_bar_id
+        slider_container.append(slider_container_bar)
+
+        var slider_container_input = document.createElement("div")
+        slider_container_input.className = "row slider-input"
+        slider_container_input.id = container_id + "-slider-input"
+        slider_container.append(slider_container_input)
+        slider_container_input.append(min_input)
+        slider_container_input.append(max_input)
+
+        $("#" + container_id).append(slider_container)
+        $("#" + slider_container_bar_id).slider({
+            range: true,
+            min: min,
+            max: max,
+            step: step,
+            values: values,
+            slide: function(event, ui) {
+                for (var i = 0; i < ui.values.length; ++i) {
+                    if (dtype == 'date'){
+                        var value = new Date(min_date)
+                        value.setDate(value.getDate() + ui.values[i])
+                        var value = new Date(value).toISOString().split('T')[0]
+                    } else {
+                        var value = ui.values[i]
+                    }
+                    $("input." + feature + "-slider[data-index=" + i + "]").val(value);
+                }
+            }
+        });
+    }
+
+    make_multi_dropdown(container_id, feature, values, selected_values){
+        var dropdown = document.createElement("select")
+        dropdown.setAttribute('data-live-search', "true");
+        dropdown.setAttribute('data-width', "100%");
+        var multiple = document.createAttribute("multiple")
+        dropdown.setAttributeNode(multiple)
+        dropdown.id = "filter-" + feature
+        dropdown.className = "filter-values-dropdown"
+        for (var i=0; i<values.length; i++){
+            var option = document.createElement("option")
+            option.innerHTML = values[i]
+            option.value = values[i]
+            if (selected_values.includes(values[i])){
+                option.selected = true
+            }
+            dropdown.appendChild(option)
+        }
+        $("#" + container_id).append(dropdown)
+        $("#filter-" + feature).selectpicker()
+    }
+
+    get_filter_content(container_id, feature, values, dtype){
+        if (dtype == 'numeric'){
+            this.make_slider(container_id, feature, this.feature_values[feature][0], this.feature_values[feature][1], values, .1, dtype, null)
+        } else if (dtype == 'date'){
+            var all_values = this.feature_values[feature]
+            var milli_to_days = 1000*60*60*24
+            var min_date = Date.parse(all_values[0])
+            var max_date = Date.parse(all_values[1])
+            var days = (max_date - min_date) / milli_to_days
+
+            var min_selected_date = Date.parse(values[0])
+            var max_selected_date = Date.parse(values[1])
+            var min_selected_days = (min_selected_date - min_date) / milli_to_days
+            var max_selected_days = (max_selected_date - min_date) / milli_to_days
+            this.make_slider(container_id, feature, 0, days, [min_selected_days, max_selected_days], 1, dtype, min_date)
+        } else if (dtype == 'nominal'){
+            this.make_multi_dropdown(container_id, feature, this.feature_values[feature], values)
+        }
     }
 
     get_remove_button(feature){
         var remove_button = document.createElement("button")
         remove_button.id = "remove-filter-button-" + feature
-        remove_button.className = "btn remove-filter-button"
+        remove_button.className = "btn remove-filter-button col-4"
         var remove_icon = document.createElement("i")
         remove_icon.className = "fas fa-times"
         remove_button.appendChild(remove_icon)
         return remove_button
+    }
+
+    make_filter(feature, values, dtype){
+        var container = document.createElement("div")
+        container.className = "filter-container"
+        var container_id = "filter-container-" + feature
+        container.id = container_id
+
+        var label_container = document.createElement("div")
+        label_container.className = "row"
+        var label = document.createElement("div")
+        label.className = "filter-label col-8"
+        label.innerHTML = feature
+        label_container.append(label)
+
+        var remove_button = this.get_remove_button(feature)
+        label_container.append(remove_button)
+        container.append(label_container)
+
+        $("#" + this.container_id).append(container)
+        this.get_filter_content(container_id, feature, values, dtype)
+    }
+
+    make_filters(filter){
+        for (var feature in filter){
+            this.make_filter(feature, filter[feature], this.dtypes[feature])
+        }
+    }
+
+    get_filter_container(feature){
+        var container = document.createElement("div")
+        container.className = "filter-container"
+        container.id = "filter-container-" + feature
+        return container
     }
 
     get_filter_nominal(feature, values){
@@ -116,6 +252,9 @@ class Control {
         }
 
         var container = this.get_filter_container(feature)
+        var label = document.createElement('div')
+        label.innerHTML = feature
+        container.appendChild(label)
         container.appendChild(filter_values)
         var remove_button = this.get_remove_button(feature)
         container.appendChild(remove_button)
@@ -131,21 +270,24 @@ class Control {
         return filter_values
     }
 
-    make_slider(feature, min, max, values, step){
-        var filter_values = this.get_filter_values(feature)
-        var container = this.get_filter_container(feature)
-        container.appendChild(filter_values)
-        var remove_button = this.get_remove_button(feature)
-        container.appendChild(remove_button)
-        $("#" + this.container_id).append(container)
-        $("#filter-values-" + feature).slider({
-            range: true,
-            min: min,
-            max: max,
-            step: step,
-            values: values
-        });
-    }
+    // make_slider(feature, min, max, values, step){
+    //     var filter_values = this.get_filter_values(feature)
+    //     var container = this.get_filter_container(feature)
+    //     var label = document.createElement('div')
+    //     label.innerHTML = feature
+    //     container.appendChild(label)
+    //     container.appendChild(filter_values)
+    //     var remove_button = this.get_remove_button(feature)
+    //     container.appendChild(remove_button)
+    //     $("#" + this.container_id).append(container)
+    //     $("#filter-values-" + feature).slider({
+    //         range: true,
+    //         min: min,
+    //         max: max,
+    //         step: step,
+    //         values: values
+    //     });
+    // }
 
     get_filter_date(feature, values){
         var all_values = this.feature_values[feature]
@@ -170,22 +312,6 @@ class Control {
         //     this.specified_plot.plot.remove_filter(feature)
         //     $("#filter-container-" + feature).remove()
         // }.bind(this))
-    }
-
-    add_filter(feature, values){
-        console.log("control add filter")
-        var dtype = this.dtypes[feature]
-        if (['numeric', 'ordinal'].includes(dtype)){
-            this.get_filter_numeric(feature, values)
-        } else if (dtype == 'date'){
-            this.get_filter_date(feature, values)
-        } else {
-            this.get_filter_nominal(feature, values)
-        }
-    }
-
-    remove_filter(feature){
-        $("#filter-container-" + feature).remove()
     }
 
     set_from_plot(plot){
@@ -217,12 +343,13 @@ class Control {
         $("#y").val(y);
         $("#color").val(color);
         $("#mark").val(mark);
+
+        this.clear_filters()
         this.update_plot = true
     }
 
-    set_controls(specified_plot){
+    set_controls(plot){
         this.from_plot = true
-        var plot = specified_plot.plot
         var x = plot.x
         var x_values = plot.x_values
         var y = plot.y
@@ -231,30 +358,33 @@ class Control {
         var filter = plot.filter
         var mark = plot.mark
 
-        if (color == 'x_values'){
-            $("#color option[value='x_values']").remove();
-            if (this.dtypes[x] == 'numeric'){
-                var x_values_text = [x_values[0].toFixed(2), x_values[1].toFixed(2)]
-            } else {
-                var x_values_text = x_values
+        if(color == x + '_values'){
+            if (document.getElementById("color").length > this.num_x_options + 2){
+                $("select[name=color] option:last").remove();
             }
-            color = "x_values"
-            $('#color').append($('<option>', {
-                value: color,
-                text: x+ ' in [' + x_values_text + ']'
-            }));   
+            if (this.dtypes[x] == 'numeric'){
+                var x_values_text = x + ' between ' + [x_values[0].toFixed(2), x_values[1].toFixed(2)]
+            } else if (this.dtypes[x] == 'nominal') {
+                var x_values_text = x + ' in ' + x_values
+            } else if (['ordinal', 'date'].includes(this.dtypes[x])){
+                var x_values_text = x + ' between ' + [x_values[0], x_values[1]]
+            } else if (this.dtypes[x] == 'binary'){
+                var x_values_text = x + ' = ' + x_values[0]
+            }
         }
+        $('#color').append($('<option>', {
+            value: color,
+            text: x_values_text
+        }));
 
         $("#x").val(x);
         $("#y").val(y);
         $("#color").val(color);
         $("#mark").val(mark);
 
-        $(".filter-values-dropdown").remove()
-        for (var feature in filter){
-            this.add_filter(feature, filter[feature])
-        }
-        $(".filter-values-dropdown").selectpicker();
+        $(".filter-container").remove()
+        this.make_filters(filter)
         this.from_plot = false
     }
+
 }
