@@ -4,6 +4,10 @@
     --hovered_color: #b41fa8;
 }
 
+#predicates-text-outer{
+    height: calc(100% - (2 * var(--margin))) !important;
+}
+
 .header {
     font-weight: bold;
     margin-left: 10px;
