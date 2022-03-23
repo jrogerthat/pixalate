@@ -49,14 +49,29 @@ class SpecifiedPlot{
         }
     }
 
+    // $('#filter-' + feature).change(function(){
+    //     var values = $('#filter-' + feature).val()
+    //     console.log(values)
+    //     plot.x_values = values
+    //     console.log(plot)
+    //     this.specified_plot = this.specified_plot.update_plot(plot)
+    //     // var new_plot = plot.plot.update_plot(null, null, null, values, null, null)
+    //     // plot.update_plot(new_plot, false)
+    // }.bind(this))
+
     control_change(){
         var x = $('#x').val()
+        var x_values = $('#filter-' + x).val()
+        console.log('control_change')
+        console.log(x)
+        console.log(x_values)
+
         var y = $('#y').val()
         var mark = $('#mark').val()
         var size = $('#size').val()
         var color = $('#color').val()
         var shape = $('#shape').val()
-        var plot = this.plot.update_plot(x, y, null, color, null, mark)
+        var plot = this.plot.update_plot(x, x_values, y, null, color, null, mark)
         return plot
     }
 }

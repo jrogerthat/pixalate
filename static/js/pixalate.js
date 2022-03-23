@@ -149,6 +149,9 @@ class PixalAte{
             $('[href="#null-tab"]').tab('show');
         }
         this.recommended_plots.clear_recommendations()
+        $('#filter-' + feature).change(function(){
+            this.control_change()
+        }.bind(this))
     }
 
     specified_back(){

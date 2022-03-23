@@ -165,6 +165,6 @@
     padding: 0px;
 }
 
-#control-container{
-    overflow-y: scroll;
-}
+/* .filter-option-inner{
+    color: black !important;
+} */

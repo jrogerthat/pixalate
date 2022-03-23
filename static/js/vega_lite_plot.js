@@ -160,11 +160,15 @@ class Plot extends VegaLitePlot {
         this.plot_spec(this.data, this.dtypes, this.x, this.x_values, spec, this.plot_container_id, width, height)
     }
 
-    update_plot(x, y, agg, color, filter, mark){
+    update_plot(x, x_values, y, agg, color, filter, mark){
         var plot = this.copy(this.plot_container_id)
         if (x != null){
             plot.x = x
         }
+        if (x_values != null){
+            plot.x_values = x_values
+        }
+
         if (y != null){
             plot.y = y
         }
