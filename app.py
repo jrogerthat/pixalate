@@ -4,6 +4,7 @@ import json
 import pandas as pd
 from pandas.core.dtypes import dtypes
 import numpy as np
+from predicate_induction_main import Predicate
 
 app = Flask(__name__)
 app.secret_key = ''
@@ -12,8 +13,8 @@ path = os.path.dirname(os.path.realpath(__file__))
 
 @app.route("/")
 def index():
-    name = "sales"
-    score_col = "anomaly_score"
+    name = "superstore"
+    score_col = "iforest_score"
     random_seed = 34231
 
     with open(f'{path}/static/data/{name}_predicate_masks.json', 'r') as f:
@@ -27,8 +28,9 @@ def index():
 
     predicate_masks = {k: list(pd.DataFrame({ki: list(vi.values()) for ki, vi in v.items()}).all(axis=1).values) for k,v in predicate_feature_masks.items()}
     predicate_masks = {k: [bool(vi) for vi in v] for k, v in predicate_masks.items()}
-    data = pd.read_csv(f'{path}/static/data/{name}_{random_seed}_data.csv')#.head(50)
+    data = pd.read_csv(f'{path}/static/data/{name}_data.csv')#.head(50)
     features = list(data.columns)
+    print(data.head())
     feature_values = {}
     for feature in features:
         if dtypes[feature] in ['numeric', 'ordinal']:
@@ -86,8 +88,36 @@ def get_recommendations(predicate_id, feature):
         ]) 
     return res
 
+def get_recommendations_(x, x_values, filters):
+    name = "superstore"
+    score_col = "iforest_score"
+    random_seed = 34231
+
+    with open(f'{path}/static/data/{name}_dtypes.json', 'r') as f:
+        dtypes = json.load(f)
+    data = pd.read_csv(f'{path}/static/data/{name}_data.csv')
+
+    p1 = Predicate(filters, dtypes)
+    p2 = Predicate({x: x_values}, dtypes)
+    p1.fit(data)
+    if len(filters) == 0:
+        p1.mask = pd.Series(np.ones(len(data))).astype(bool)
+    p2.fit(data)
+    in_d = data.loc[p1.mask & p2.mask]
+    out_d = data.loc[p1.mask & ~p2.mask]
+    res = {feature: [in_d[feature].mean(), out_d[feature].mean()] for feature, dtype in dtypes.items() if dtype in ['numeric', 'ordinal'] and feature != score_col}
+    res = [{'feature': k, 'in_mean': v[0], 'out_mean': v[1], 'direction': ['low', 'high'][v[0] > v[1]]} for k,v in res.items()]
+    return res
+
 @app.route("/get_recommendations", methods=['POST'])
 def app_get_recommendations():
+    request_data = request.get_json(force=True)
+    x = request_data['x']
+    x_values = request_data['x_values']
+    filters = request_data['filters']
+
+    res = get_recommendations_(x, x_values, filters)
+    return {'recommendations': res}
     # data = pd.read_csv(f'{path}/static/data/superstore_data_43214123.csv')
     # encoded_data = pd.read_csv(f'{path}/static/data/superstore_encoded_data_43214123.csv')
     # with open(f'{path}/static/data/dtypes.json', 'r') as f:

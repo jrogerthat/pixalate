@@ -1,8 +1,3 @@
-//TODO: remake predicates
-//TODO: snap to predicate text
-//TODO: hover graph/predcate list
-//TODO: dynamic filters
-
 class PixalAte{
     constructor(graph, text, specified_plot, recommended_plots, bookmarked_plots, score_plot_container_id, feature_plots_container_id, data, dtypes, score_col,
                 predicates, predicate_masks, predicate_feature_masks){
@@ -90,13 +85,15 @@ class PixalAte{
         if (this.recommended_plots.plots.length == 0){
             var plot = this.specified_plot.plot
             var predicate = this.predicates[this.selected_predicate_id]
-            this.recommended_plots.get_recommendations(this.selected_predicate_id, predicate, this.selected_feature, "mean").then(function(resp){
-                var recommendations = []
-                for (var i=0; i<resp['recommendations'].length; i++){
-                    var direction = this.get_direction(this.selected_feature, resp['recommendations'][i]['feature'], this.predicate_masks[this.selected_predicate_id], this.predicate_feature_masks[this.selected_predicate_id])
-                    recommendations.push({'feature': resp['recommendations'][i]['feature'], 'direction': direction})
-                }
-                this.recommended_plots.plot_recommendations(plot, recommendations)
+            // this.recommended_plots.get_recommendations(this.selected_predicate_id, predicate, this.selected_feature, "mean").then(function(resp){
+            this.recommended_plots.get_recommendations(this.specified_plot.plot.x, this.specified_plot.plot.x_values, this.specified_plot.plot.filter, "mean").then(function(resp){
+                this.recommended_plots.plot_recommendations(plot, resp['recommendations'])
+                // var recommendations = []
+                // for (var i=0; i<resp['recommendations'].length; i++){
+                //     var direction = this.get_direction(this.selected_feature, resp['recommendations'][i]['feature'], this.predicate_masks[this.selected_predicate_id], this.predicate_feature_masks[this.selected_predicate_id])
+                //     recommendations.push({'feature': resp['recommendations'][i]['feature'], 'direction': direction})
+                // }
+                // this.recommended_plots.plot_recommendations(plot, recommendations)
                 $(".small-multiple").click(function(elem){
                     this.select_small_multiple(elem, true)
                 }.bind(this))
@@ -176,6 +173,7 @@ class PixalAte{
         var in_sum = 0
         var out_sum = 0
 
+        console.log(predicate_feature_mask[x])
         for (var i=0; i<this.data.length; i++){
             if (predicate[i]){
                 var in_predicate = predicate_feature_mask[x][i]
@@ -189,7 +187,7 @@ class PixalAte{
             }
         }
 
-        console.log(out_mean)
+        console.log(out_sum)
         console.log(out_count)
         var in_mean = in_sum / in_count
         var out_mean = out_sum / out_count

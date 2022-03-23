@@ -1,4 +1,4 @@
-.in-text{
+/* .in-text{
     background-color: var(--selected_color);
     color: #ebebeb;
 }
@@ -6,22 +6,30 @@
 .out-text{
     background-color: #949494;
     color: #ebebeb;
-}
+} */
 
 .y-text{
-    background-color: #eb5454;
+    color: #eb5454;
 }
 
 .in-mean-text{
-    background-color: var(--selected_color);
-    color: #ebebeb;
+    color: #eb5454;
 }
 
 .out-mean-text{
+    color: #eb5454;
+}
+
+/* .in-mean-text{
+    background-color: var(--selected_color);
+    color: #ebebeb;
+} */
+
+/* .out-mean-text{
     background-color: #949494;
     color: #ebebeb;
 }
 
 .filters-text{
     background-color: #00c7b0;
-}
+} */

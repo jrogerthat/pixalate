@@ -13,11 +13,13 @@ class RecommendedPlots{
     }
 
     plot_recommendations(plot, recommendations){
+        console.log('plot_recommendations')
         this.recommendations = recommendations
         for (var i=0; i<recommendations.length; i++){
-            var direction = recommendations[i]['direction']
+            console.log(recommendations[i])
+            var direction = {'direction': recommendations[i]['direction'], 'in_mean': recommendations[i]['in_mean'], 'out_mean': recommendations[i]['out_mean']}
             var feature = recommendations[i]['feature']
-
+            
             var container_id = this.container_id + '-' + i
             var container = document.createElement("div")
             container.id = container_id
@@ -34,12 +36,26 @@ class RecommendedPlots{
         }
     }
 
-    get_recommendations(predicate_id, predicate, feature, agg){
+    // get_recommendations(predicate_id, predicate, feature, agg){
+    //     return $.ajax({
+    //         url: '/get_recommendations',
+    //         type: "POST",
+    //         dataType: "JSON",
+    //         data: JSON.stringify({'predicate_id': predicate_id, 'predicate': predicate, 'feature': feature, 'agg': agg}),
+    //         success: function(resp){
+    //             if (resp != null){
+    //                 return resp
+    //             }
+    //         }
+    //     });
+    // }
+
+    get_recommendations(x, x_values, filters, agg){
         return $.ajax({
             url: '/get_recommendations',
             type: "POST",
             dataType: "JSON",
-            data: JSON.stringify({'predicate_id': predicate_id, 'predicate': predicate, 'feature': feature, 'agg': agg}),
+            data: JSON.stringify({'x': x, 'x_values': x_values, 'filters': filters, 'agg': agg}),
             success: function(resp){
                 if (resp != null){
                     return resp

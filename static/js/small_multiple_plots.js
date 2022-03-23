@@ -107,13 +107,13 @@ class SmallMultiplePlots{
         y_text.id = this.container_id + "-y-text"
         y_text.className = "y-text"
         text_container.appendChild(y_text)
-
-        var x_filter_text = this.get_x_filter_text(this.original_plot.filter, this.original_plot.x, this.original_plot.x_values, this.original_plot.dtypes)
-        text_container.appendChild(x_filter_text['in_text'])
         var y_in_mean_text = document.createElement("span")
         y_in_mean_text.innerHTML = " (" + in_mean.toFixed(2) + ") "
         y_in_mean_text.className = "in-mean-text"
         text_container.appendChild(y_in_mean_text)
+
+        var x_filter_text = this.get_x_filter_text(this.original_plot.filter, this.original_plot.x, this.original_plot.x_values, this.original_plot.dtypes)
+        text_container.appendChild(x_filter_text['in_text'])
 
         var compared_to_text = document.createElement("span")
         compared_to_text.innerHTML = " compared to"
@@ -160,7 +160,7 @@ class SmallMultiplePlots{
     }
 
     change_plot_y(y){
-        this.plot = this.plot.update_plot(null, y, null, null, null, null)
+        this.plot = this.plot.update_plot(null, null, y, null, null, null, null)
         this.plot.plot("container", "container")
     }
 
