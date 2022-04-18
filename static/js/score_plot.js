@@ -17,7 +17,7 @@ class ScorePlot extends VegaLitePlot{
                 {
                     "density": this.score_col,
                     "groupby": ["predicate"],
-                    "bandwidth": .01
+                    "bandwidth": 0.49
                     // "steps": 100
                 }
             ],

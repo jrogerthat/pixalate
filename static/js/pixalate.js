@@ -94,8 +94,10 @@ class PixalAte{
                 //     recommendations.push({'feature': resp['recommendations'][i]['feature'], 'direction': direction})
                 // }
                 // this.recommended_plots.plot_recommendations(plot, recommendations)
-                $(".small-multiple").click(function(elem){
+                $(".recommended-plot").click(function(elem){
                     this.select_small_multiple(elem, true)
+                    $("#bookmark-button").addClass("btn-outline-secondary")
+                    $("#bookmark-button").removeClass("btn-primary")
                 }.bind(this))
             }.bind(this))
         }
@@ -166,38 +168,52 @@ class PixalAte{
         this.update_specified_plot(plot, false)
     }
 
-    get_direction(x, y, predicate, predicate_feature_mask){
-        console.log('get_direction')
-        var in_count = 0
-        var out_count = 0
-        var in_sum = 0
-        var out_sum = 0
-
-        console.log(predicate_feature_mask[x])
-        for (var i=0; i<this.data.length; i++){
-            if (predicate[i]){
-                var in_predicate = predicate_feature_mask[x][i]
-                if (in_predicate){
-                    in_count++
-                    in_sum += this.data[i][y]
-                } else {
-                    out_count++
-                    out_sum += this.data[i][y]
+    get_direction(x, x_values, y, filters, agg){
+        return $.ajax({
+            url: '/get_direction',
+            type: "POST",
+            dataType: "JSON",
+            data: JSON.stringify({'x': x, 'x_values': x_values, 'y': y, 'filters': filters, 'agg': agg}),
+            success: function(resp){
+                if (resp != null){
+                    return resp
                 }
             }
-        }
-
-        console.log(out_sum)
-        console.log(out_count)
-        var in_mean = in_sum / in_count
-        var out_mean = out_sum / out_count
-        if (in_mean > out_mean){
-            var direction = 'high'
-        } else {
-            var direction = 'low'
-        }
-        return {'direction': direction, 'in_mean': in_mean, 'out_mean': out_mean}
+        });
     }
+
+    // get_direction(x, y, predicate, predicate_feature_mask){
+    //     console.log('get_direction')
+    //     var in_count = 0
+    //     var out_count = 0
+    //     var in_sum = 0
+    //     var out_sum = 0
+
+    //     console.log(predicate_feature_mask[x])
+    //     for (var i=0; i<this.data.length; i++){
+    //         if (predicate[i]){
+    //             var in_predicate = predicate_feature_mask[x][i]
+    //             if (in_predicate){
+    //                 in_count++
+    //                 in_sum += this.data[i][y]
+    //             } else {
+    //                 out_count++
+    //                 out_sum += this.data[i][y]
+    //             }
+    //         }
+    //     }
+
+    //     console.log(out_sum)
+    //     console.log(out_count)
+    //     var in_mean = in_sum / in_count
+    //     var out_mean = out_sum / out_count
+    //     if (in_mean > out_mean){
+    //         var direction = 'high'
+    //     } else {
+    //         var direction = 'low'
+    //     }
+    //     return {'direction': direction, 'in_mean': in_mean, 'out_mean': out_mean}
+    // }
 
     toggle_bookmark(){
         $('#bookmark-button').prop('disabled', false)
@@ -211,27 +227,54 @@ class PixalAte{
     }
 
     bookmark(){
+        console.log('bookmark')
         $('[href="#bookmarked-tab"]').tab('show');
         var plot = this.specified_plot.plot
-        if (plot != null){
-            if (this.specified_plot.is_bookmarked){
-                this.bookmarked_plots.remove_bookmark(plot)
-                this.specified_plot.is_bookmarked = false
-                
-            } else {
-                var predicate_feature_mask = this.predicate_feature_masks[this.selected_predicate_id]
-                var predicate = this.predicates[this.selected_predicate_id]
-                console.log(predicate)
-                var direction = this.get_direction(plot.x, plot.y, predicate, predicate_feature_mask)
+        var is_bookmarked = this.bookmarked_plots.is_bookmarked(this.specified_plot)
+        console.log(is_bookmarked)
+        if (is_bookmarked){
+            this.bookmarked_plots.remove_bookmark(plot)
+            $("#bookmark-button").addClass("btn-outline-secondary")
+            $("#bookmark-button").removeClass("btn-primary")
+        } else {
+            this.get_direction(this.specified_plot.plot.x, this.specified_plot.plot.x_values, this.specified_plot.plot.y, this.specified_plot.plot.filter, "mean").then(function(direction){
                 this.bookmarked_plots.add_bookmark(plot, direction)
-                this.specified_plot.is_bookmarked = true
-            }
-            this.toggle_bookmark()
-            $(".small-multiple").click(function(elem){
-                this.select_small_multiple(elem, false)
+                $("#bookmark-button").removeClass("btn-outline-secondary")
+                $("#bookmark-button").addClass("btn-primary")
             }.bind(this))
         }
     }
+
+    // bookmark(){
+    //     console.log('bookmark')
+    //     $('[href="#bookmarked-tab"]').tab('show');
+    //     var plot = this.specified_plot.plot
+    //     if (plot != null){
+    //         console.log(this.specified_plot.is_bookmarked)
+    //         if (this.specified_plot.is_bookmarked){
+    //             this.bookmarked_plots.remove_bookmark(plot)
+    //             this.specified_plot.is_bookmarked = false
+    //             $("#bookmark-button").removeClass("btn-outline-secondary")
+    //             $("#bookmark-button").addClass("btn-primary")
+    //         } else {
+    //             var predicate_feature_mask = this.predicate_feature_masks[this.selected_predicate_id]
+    //             var predicate = this.predicates[this.selected_predicate_id]
+    //             console.log(predicate)
+    //             this.get_direction(this.specified_plot.plot.x, this.specified_plot.plot.x_values, this.specified_plot.plot.y, this.specified_plot.plot.filter, "mean").then(function(resp){
+    //                 // var direction = this.get_direction(plot.x, plot.y, predicate, predicate_feature_mask)
+    //                 // this.bookmarked_plots.add_bookmark(plot, direction)
+    //                 this.bookmarked_plots.add_bookmark(plot, resp)
+    //                 this.specified_plot.is_bookmarked = true
+    //                 $("#bookmark-button").removeClass("btn-outline-secondary")
+    //                 $("#bookmark-button").addClass("btn-primary")
+    //             }.bind(this))
+    //         }
+    //         // this.toggle_bookmark()
+    //         $(".bookmarked-plot").click(function(elem){
+    //             this.select_small_multiple(elem, false)
+    //         }.bind(this))
+    //     }
+    // }
 
     get_plot_from_container_id(container_id){
         if (container_id.split('-')[0] == 'boomarked'){
@@ -244,6 +287,7 @@ class PixalAte{
         var content_id_array = content_id.split('-')
         content_id_array.splice(content_id_array.length-1, 1)
         var container_id = content_id_array.join('-')
+
         if (is_recommended){
             var plot = this.recommended_plots.get_plot_from_container_id(container_id)
         } else {

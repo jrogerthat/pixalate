@@ -59,6 +59,13 @@ class Control {
             }
         }
         var y_dropdown = this.get_dropdown('y', y_options)
+
+        var marks_header = document.createElement("div")
+        marks_header.className = "header"
+        marks_header.innerHTML = "Marks"
+        var mark_dropdown = this.get_dropdown('mark', ['bar', 'point', 'line'])
+        $("#" + this.container_id).append(marks_header)
+        $("#" + this.container_id).append(mark_dropdown)
         $("#" + this.container_id).append(encoding_header)
         $("#" + this.container_id).append(x_dropdown)
         $("#" + this.container_id).append(y_dropdown)
@@ -103,6 +110,8 @@ class Control {
     }
 
     make_slider(container_id, feature, min, max, values, step, dtype, min_date){
+        console.log('make_slider')
+        console.log(feature)
         var min_input = document.createElement("input")
         min_input.type = "text"
         min_input.className = feature + "-slider slider col-6"
@@ -138,6 +147,10 @@ class Control {
         slider_container_input.append(min_input)
         slider_container_input.append(max_input)
 
+        console.log(min)
+        console.log(max)
+        console.log(step)
+        console.log(values)
         $("#" + container_id).append(slider_container)
         $("#" + slider_container_bar_id).slider({
             range: true,
@@ -252,7 +265,7 @@ class Control {
         }
     }
 
-    make_color_filter(feature, values, plot){
+    make_color_filter(feature, values){
         this.make_filter('color-container', feature, values, this.dtypes[feature], false, '100')
     }
 
@@ -331,7 +344,6 @@ class Control {
         var max_selected_date = Date.parse(values[1])
         var min_selected_days = (min_selected_date - min_date) / milli_to_days
         var max_selected_days = (max_selected_date - min_date) / milli_to_days
-
         this.make_slider(feature, 0, days, [min_selected_days, max_selected_days], 1)
     }
 
@@ -396,7 +408,7 @@ class Control {
 
         $(".filter-container").remove()
         this.make_filters(filter)
-        this.make_color_filter(x, x_values, plot)
+        this.make_color_filter(x, x_values)
         this.from_plot = false
     }
 

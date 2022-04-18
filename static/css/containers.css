@@ -4,6 +4,10 @@
     --hovered_color: #b41fa8;
 }
 
+#control-container {
+    overflow-y: scroll;
+}
+
 #predicates-text-outer{
     height: calc(100% - (2 * var(--margin))) !important;
 }

@@ -1,15 +1,16 @@
 class SmallMultiplePlots{
-    constructor(container_id, original_plot, feature_values){
+    constructor(container_id, original_plot, feature_values, classname){
         this.container_id = container_id
         this.original_plot = original_plot
         this.feature_values = feature_values
+        this.classname = classname
         this.plot = null
     }
 
     create_container(container_id){
         var container = document.createElement("div")
         container.id = container_id
-        container.className = "row small-multiple"
+        container.className = "row small-multiple " + this.classname
 
         var plot_container = document.createElement("div")
         plot_container.id = container_id + "-plot"
@@ -84,7 +85,12 @@ class SmallMultiplePlots{
         } else if (dtypes[x] == 'binary'){
             var out_t = this.get_feature_value_text(x, x_values, dtypes[x])
         }
-        out_text.innerHTML = " when " + out_t
+
+        if (this.feature_values[x].length - x_values.length > 5){
+            out_text.innerHTML = " other " + x + 's'
+        } else {
+            out_text.innerHTML = " when " + out_t
+        }
 
         var filters_text = document.createElement("span")
         filters_text.id = this.container_id + "-filters-text"
@@ -115,11 +121,16 @@ class SmallMultiplePlots{
         var x_filter_text = this.get_x_filter_text(this.original_plot.filter, this.original_plot.x, this.original_plot.x_values, this.original_plot.dtypes)
         text_container.appendChild(x_filter_text['in_text'])
 
-        var compared_to_text = document.createElement("span")
-        compared_to_text.innerHTML = " compared to"
-        text_container.appendChild(compared_to_text)
+        if (x_filter_text['out_text'] == null){
+            var out_text = 'compared to other ' + this.original_plot.x
+            text_container.appendChild(out_text)
+        } else {
+            var compared_to_text = document.createElement("span")
+            compared_to_text.innerHTML = " compared to"
+            text_container.appendChild(compared_to_text)
+            text_container.appendChild(x_filter_text['out_text'])
+        }
 
-        text_container.appendChild(x_filter_text['out_text'])
         var y_out_mean_text = document.createElement("span")
         y_out_mean_text.innerHTML = " (" + out_mean.toFixed(2) + ") "
         y_out_mean_text.className = "out-mean-text"

@@ -19,6 +19,8 @@ class SpecifiedPlot{
         if (update_control){
             self.control.set_controls(self.plot)
         }
+        $("#bookmark-button").removeClass("btn-outline-secondary")
+        $("#bookmark-button").addClass("btn-primary")
         return self
     }
 

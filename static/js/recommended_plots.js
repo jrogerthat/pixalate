@@ -16,7 +16,6 @@ class RecommendedPlots{
         console.log('plot_recommendations')
         this.recommendations = recommendations
         for (var i=0; i<recommendations.length; i++){
-            console.log(recommendations[i])
             var direction = {'direction': recommendations[i]['direction'], 'in_mean': recommendations[i]['in_mean'], 'out_mean': recommendations[i]['out_mean']}
             var feature = recommendations[i]['feature']
             
@@ -27,7 +26,7 @@ class RecommendedPlots{
             this.container_ids.push(container_id)
             $("#" + this.container_id).append(container)
 
-            var rec_plot = new SmallMultiplePlots(container_id, plot, this.feature_values)
+            var rec_plot = new SmallMultiplePlots(container_id, plot, this.feature_values, 'recommended-plot')
             rec_plot.create_plot_and_text(direction)
             rec_plot.change_plot_y(feature)
             rec_plot.change_text_y(feature, direction['direction'])

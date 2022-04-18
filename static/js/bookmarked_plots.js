@@ -14,12 +14,23 @@ class BookmarkedPlots{
         div.id = id
         $("#" + this.container_id).append(div)
         
-        var new_plot = new SmallMultiplePlots(id, plot, this.feature_values)
+        var new_plot = new SmallMultiplePlots(id, plot, this.feature_values, 'bookmarked-plot')
         new_plot.create_plot_and_text(direction)
         new_plot.plot.plot("container", "container")
         this.plots.push(new_plot.plot)
         this.container_ids.push(id)
         this.num_plots++
+    }
+
+    is_bookmarked(plot){
+        var any_match = false
+        for (var i=0; i<this.plots.length; i++){
+            var match = this.plots[i].x == plot.x && this.plots[i].y == plot.y
+            if (match){
+                any_match = true
+            }
+        }
+        return any_match
     }
 
     get_plot_index(plot){
@@ -35,16 +46,16 @@ class BookmarkedPlots{
     remove_bookmark(plot){
         var index = this.get_plot_index(plot)
         var container_id = this.container_ids[index]
+        this.plots.splice(index, 1)
         $("#" + container_id).remove()
     }
 
-    is_bookmarked(plot){
-        var index = this.get_plot_index(plot)
-        return index > -1
-    }
+    // is_bookmarked(plot){
+    //     var index = this.get_plot_index(plot)
+    //     return index > -1
+    // }
 
     get_plot_from_container_id(container_id){
-        console.log(this.container_ids)
         var index = this.container_ids.indexOf(container_id)
         return this.plots[index]
     }

@@ -28,13 +28,13 @@
     width: 100%
   }
 
-#dropdown-label-y {
+/* #dropdown-label-y {
     background-color: #eb5454;;
-}
+} */
 
-#y {
+/* #y {
     background-color: #d67a7a;;
-}
+} */
 
 #dropdown-label-color {
     background-color: var(--selected_color)
@@ -52,7 +52,8 @@
     margin-right: 9px;
     margin-bottom: 10px;
     width: calc(100% - 18px);
-    background-color: #00c7b0;
+    background-color: #c0c0c0
+    /* background-color: #00c7b0; */
 }
 
 .slider-input {
