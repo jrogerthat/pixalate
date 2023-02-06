@@ -12,7 +12,7 @@ app.config['SESSION_TYPE'] = 'filesystem'
 path = os.path.dirname(os.path.realpath(__file__))
 
 name = 'augmented_superstore_all'
-name = 'sensor'
+# name = 'sensor'
 score_col = 'iforest_score'
 
 @app.route("/")
